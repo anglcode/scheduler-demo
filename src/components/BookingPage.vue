@@ -62,7 +62,9 @@ export default defineComponent({
     const matchingCoaches = computed(() => {
       if (!selectedDate.value) return coaches
       const day = dateFromKey(selectedDate.value).getDay()
-      return coaches.filter((coach) => coach.days.includes(day))
+      const selectedTimeIndex = slotSets[day].indexOf(selectedTime.value)
+      return coaches.filter((coach) => coach.days.includes(day)
+        && (!selectedTime.value || coachTimeIndexes[coach.id].includes(selectedTimeIndex)))
     })
     const availableTimes = computed(() => {
       if (!selectedDate.value) return []
@@ -103,18 +105,22 @@ export default defineComponent({
       if (!isDateAvailable(day)) return
       selectedDate.value = dateKeyFor(day)
       selectedTime.value = ''
+      if (bookingMode.value === 'date') selectedCoachId.value = ''
       confirmed.value = false
     }
 
     function chooseCoach(id) {
       selectedCoachId.value = id
-      selectedDate.value = ''
-      selectedTime.value = ''
+      if (bookingMode.value === 'coach') {
+        selectedDate.value = ''
+        selectedTime.value = ''
+      }
       confirmed.value = false
     }
 
     function chooseTime(time) {
       selectedTime.value = time
+      if (bookingMode.value === 'date') selectedCoachId.value = ''
       confirmed.value = false
     }
 
